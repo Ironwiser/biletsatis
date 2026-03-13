@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1000px 600px at 20% -10%, rgba(124, 77, 255, 0.22), transparent 60%),
+    radial-gradient(900px 500px at 80% 0%, rgba(198, 255, 74, 0.14), transparent 55%),
+    #0b0c0f;
+}
+
+/* Not: Tailwind v4'te @apply token'ları bazı ortamlarda hata verebiliyor.
+   Base stilleri şimdilik plain CSS ile veriyoruz. */
+body {
+  color: hsl(0 0% 98%);
+}
+

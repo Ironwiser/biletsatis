@@ -1,0 +1,40 @@
+# Genel
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Node modülleri
+node_modules/
+b/node_modules/
+f/node_modules/
+
+# Build / dist çıktıları
+dist/
+b/dist/
+f/dist/
+build/
+
+# Typescript
+*.tsbuildinfo
+
+# Çevre değişkenleri
+.env
+.env.*
+b/.env
+b/.env.*
+f/.env
+f/.env.*
+
+# IDE / editör dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Yüklenen dosyalar (runtime upload klasörleri)
+b/uploads/
+
+f/src/assets/placeholders/*.mp4
