@@ -60,7 +60,7 @@ export async function createEvent(req: Request, res: Response) {
     }
   }
 
-  const created = await query<EventRow>(
+  const created = await query<EventRow & { is_approved: boolean }>(
     `insert into events (
        organization_id,
        name,
@@ -77,9 +77,10 @@ export async function createEvent(req: Request, res: Response) {
        social_instagram,
        social_website,
        starts_at,
-       ends_at
+       ends_at,
+       is_approved
      )
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,false)
      returning
        id,
        organization_id,
@@ -123,12 +124,17 @@ export async function createEvent(req: Request, res: Response) {
 
 export async function listEvents(req: Request, res: Response) {
   const { organizationId } = req.query;
+  const isAdmin = (req as any).user?.role === "admin";
 
   const params: any[] = [];
   let where = "where e.is_deleted = false and e.is_cancelled = false";
   if (organizationId && typeof organizationId === "string") {
     params.push(organizationId);
     where += ` and e.organization_id = $${params.length}`;
+  }
+  // Genel liste (organizationId yok): sadece onaylı etkinlikler. Admin hepsini görebilir.
+  if (!organizationId && !isAdmin) {
+    where += " and e.is_approved = true";
   }
 
   const r = await query<EventRow>(
@@ -157,6 +163,51 @@ export async function listEvents(req: Request, res: Response) {
   );
 
   return res.json({ events: r.rows });
+}
+
+export async function getEvent(req: Request, res: Response) {
+  const { id } = req.params;
+  if (!id) return res.status(400).json({ message: "event id zorunlu" });
+
+  const r = await query<EventRow & { is_approved: boolean }>(
+    `select
+       e.id,
+       e.organization_id,
+       e.name,
+       e.description,
+       e.venue,
+       e.city,
+       e.poster_url,
+       e.category,
+       e.event_type,
+       e.address,
+       e.age_limit,
+       e.door_time,
+       e.rules,
+       e.social_instagram,
+       e.social_website,
+       e.starts_at,
+       e.ends_at,
+       e.is_approved
+     from events e
+     where e.id = $1 and e.is_deleted = false and e.is_cancelled = false`,
+    [id]
+  );
+
+  if (r.rows.length === 0) {
+    return res.status(404).json({ message: "Etkinlik bulunamadı" });
+  }
+
+  const event = r.rows[0];
+  const user = (req as any).user;
+  const isAdmin = user?.role === "admin";
+  const canSeeUnapproved = isAdmin; // ileride organizatör kendi etkinliğini de görebilir
+  if (!event.is_approved && !canSeeUnapproved) {
+    return res.status(404).json({ message: "Etkinlik bulunamadı" });
+  }
+
+  const { is_approved: _unused, ...publicEvent } = event;
+  return res.json({ event: publicEvent });
 }
 
 export async function updateEvent(req: Request, res: Response) {
@@ -259,6 +310,33 @@ export async function updateEvent(req: Request, res: Response) {
     return res.status(404).json({ message: "Etkinlik bulunamadı" });
   }
 
+  return res.json({ event: r.rows[0] });
+}
+
+/** Popup'ta gösterilecek etkinlik (sadece onaylı ve silinmemiş) */
+export async function getFeaturedPopup(req: Request, res: Response) {
+  const settings = await query<{ value: string | null }>(
+    "select value from site_settings where key = $1",
+    ["featured_popup_event_id"]
+  );
+  const eventId = settings.rows[0]?.value ?? null;
+  if (!eventId) {
+    return res.json({ event: null });
+  }
+
+  const r = await query<EventRow>(
+    `select
+       e.id, e.organization_id, e.name, e.description, e.venue, e.city,
+       e.poster_url, e.category, e.event_type, e.address, e.age_limit,
+       e.door_time, e.rules, e.social_instagram, e.social_website,
+       e.starts_at, e.ends_at
+     from events e
+     where e.id = $1 and e.is_deleted = false and e.is_cancelled = false and e.is_approved = true`,
+    [eventId]
+  );
+  if (r.rows.length === 0) {
+    return res.json({ event: null });
+  }
   return res.json({ event: r.rows[0] });
 }
 

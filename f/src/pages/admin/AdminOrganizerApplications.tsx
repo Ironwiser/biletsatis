@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { MaterialReactTable, type MRT_ColumnDef } from "material-react-table";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Box, Chip, IconButton, Tooltip } from "@mui/material";
@@ -28,8 +29,6 @@ type AppRow = {
 
 export function AdminOrganizerApplications() {
   const [adminNote, setAdminNote] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [ok, setOk] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["admin-organizer-applications"],
@@ -40,32 +39,28 @@ export function AdminOrganizerApplications() {
   });
 
   async function approve(id: string) {
-    setError(null);
-    setOk(null);
     try {
       await api.post(`/admin/organizer-applications/${id}/approve`, { adminNote });
-      setOk("Onaylandı.");
+      toast.success("Onaylandı.");
       await q.refetch();
     } catch (err: unknown) {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string } | undefined)?.message ?? "Onay başarısız"
         : "Onay başarısız";
-      setError(msg);
+      toast.error(msg);
     }
   }
 
   async function reject(id: string) {
-    setError(null);
-    setOk(null);
     try {
       await api.post(`/admin/organizer-applications/${id}/reject`, { adminNote });
-      setOk("Reddedildi.");
+      toast.success("Reddedildi.");
       await q.refetch();
     } catch (err: unknown) {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string } | undefined)?.message ?? "Ret başarısız"
         : "Ret başarısız";
-      setError(msg);
+      toast.error(msg);
     }
   }
 
@@ -140,17 +135,6 @@ export function AdminOrganizerApplications() {
         <div className="text-2xl font-semibold tracking-tight">Admin • Organizatör Başvuruları</div>
         <div className="text-sm text-muted-foreground">Bekleyen başvuruları incele ve karar ver.</div>
       </div>
-
-      {error && (
-        <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-          {error}
-        </div>
-      )}
-      {ok && (
-        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-          {ok}
-        </div>
-      )}
 
       <Card className="border-white/10 bg-black/25">
         <CardHeader>

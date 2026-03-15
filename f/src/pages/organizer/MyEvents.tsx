@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api, getApiOrigin } from "../../api/client";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -48,8 +49,6 @@ export function MyEvents() {
   const [socialWebsite, setSocialWebsite] = useState("");
   const [startsAt, setStartsAt] = useState(""); // datetime-local
   const [endsAt, setEndsAt] = useState(""); // datetime-local
-  const [error, setError] = useState<string | null>(null);
-  const [ok, setOk] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [posterPreview, setPosterPreview] = useState<string | null>(null);
@@ -110,15 +109,12 @@ export function MyEvents() {
   }
 
   async function createOrUpdateEvent() {
-    setError(null);
-    setOk(null);
-
     if (!selectedOrgId) {
-      setError("Önce bir organizasyon seçmelisin.");
+      toast.error("Önce bir organizasyon seçmelisin.");
       return;
     }
     if (!name || !venue || !city || !startsAt) {
-      setError("Ad, kategori, mekan, şehir ve başlangıç tarihi zorunlu.");
+      toast.error("Ad, kategori, mekan, şehir ve başlangıç tarihi zorunlu.");
       return;
     }
 
@@ -147,10 +143,10 @@ export function MyEvents() {
 
       if (editingId) {
         await api.put(`/events/${editingId}`, payload);
-        setOk("Etkinlik güncellendi.");
+        toast.success("Etkinlik güncellendi.");
       } else {
         await api.post("/events", { organizationId: selectedOrgId, ...payload });
-        setOk("Etkinlik oluşturuldu.");
+        toast.success("Etkinlik oluşturuldu.");
       }
 
       resetForm();
@@ -159,7 +155,7 @@ export function MyEvents() {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string } | undefined)?.message ?? "Etkinlik oluşturulamadı"
         : "Etkinlik oluşturulamadı";
-      setError(msg);
+      toast.error(msg);
     }
   }
 
@@ -167,33 +163,22 @@ export function MyEvents() {
     <div className="space-y-4">
       <div>
         <div className="text-2xl font-semibold tracking-tight">Organizatör • Etkinliklerim</div>
-        <div className="text-sm text-muted-foreground">
+        <div className="text-sm text-white/50">
           Onaylı organizasyonların için tarihli etkinlikler oluştur.
         </div>
       </div>
 
-      {error && (
-        <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-          {error}
-        </div>
-      )}
-      {ok && (
-        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-          {ok}
-        </div>
-      )}
-
-      <Card className="max-w-3xl border-white/10 bg-black/25">
+      <Card className="max-w-3xl border-white/5 bg-black/40 shadow-none">
         <CardHeader>
-          <CardTitle>Yeni etkinlik</CardTitle>
-          <CardDescription>Etkinlik organizasyonuna bağlı olacak ve başlangıç tarihi takvim için kullanılacak.</CardDescription>
+          <CardTitle className="text-white/95">Yeni etkinlik</CardTitle>
+          <CardDescription className="text-white/50">Etkinlik organizasyonuna bağlı olacak ve başlangıç tarihi takvim için kullanılacak.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Organizasyon</div>
+              <div className="text-xs text-white/50">Organizasyon</div>
               <select
-                className="h-9 w-full rounded-md border border-border bg-transparent px-2 text-sm"
+                className="h-9 w-full rounded-md border border-white/10 bg-white/5 px-2 text-sm text-white/90 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/20"
                 value={selectedOrgId}
                 onChange={(e) => {
                   setSelectedOrgId(e.target.value);
@@ -210,13 +195,13 @@ export function MyEvents() {
               </select>
             </div>
             <div className="space-y-1 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Etkinlik adı</div>
+              <div className="text-xs text-white/50">Etkinlik adı</div>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Kategori</div>
+              <div className="text-xs text-white/50">Kategori</div>
               <select
-                className="h-9 w-full rounded-md border border-border bg-black/80 px-2 text-sm text-white"
+                className="h-9 w-full rounded-md border border-white/10 bg-white/5 px-2 text-sm text-white/90 focus:border-white/20 focus:outline-none focus:ring-1 focus:ring-white/20"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -236,7 +221,7 @@ export function MyEvents() {
               </select>
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Etkinlik türü (opsiyonel)</div>
+              <div className="text-xs text-white/50">Etkinlik türü (opsiyonel)</div>
               <Input
                 placeholder="Örn: Elektronik müzik, canlı performans..."
                 value={eventType}
@@ -244,23 +229,23 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Açıklama (opsiyonel)</div>
+              <div className="text-xs text-white/50">Açıklama (opsiyonel)</div>
               <textarea
-                className="min-h-[80px] w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="min-h-[80px] w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 placeholder:text-white/40 focus-visible:outline-none focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-white/20"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Mekan</div>
+              <div className="text-xs text-white/50">Mekan</div>
               <Input value={venue} onChange={(e) => setVenue(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Şehir</div>
+              <div className="text-xs text-white/50">Şehir</div>
               <Input value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
             <div className="space-y-1 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Adres (opsiyonel)</div>
+              <div className="text-xs text-white/50">Adres (opsiyonel)</div>
               <Input
                 placeholder="Mekan adresi"
                 value={address}
@@ -268,7 +253,7 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Başlangıç (tarih & saat)</div>
+              <div className="text-xs text-white/50">Başlangıç (tarih & saat)</div>
               <Input
                 type="datetime-local"
                 value={startsAt}
@@ -276,7 +261,7 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Bitiş (opsiyonel)</div>
+              <div className="text-xs text-white/50">Bitiş (opsiyonel)</div>
               <Input
                 type="datetime-local"
                 value={endsAt}
@@ -284,7 +269,7 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Kapı açılış saati (metin)</div>
+              <div className="text-xs text-white/50">Kapı açılış saati (metin)</div>
               <Input
                 placeholder="Örn: 20:00"
                 value={doorTime}
@@ -292,7 +277,7 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Yaş sınırı (metin)</div>
+              <div className="text-xs text-white/50">Yaş sınırı (metin)</div>
               <Input
                 placeholder="Örn: 18+, 21+"
                 value={ageLimit}
@@ -300,16 +285,16 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Etkinlik kuralları (opsiyonel)</div>
+              <div className="text-xs text-white/50">Etkinlik kuralları (opsiyonel)</div>
               <textarea
-                className="min-h-[80px] w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="min-h-[80px] w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 placeholder:text-white/40 focus-visible:outline-none focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-white/20"
                 placeholder="Mekan kuralları, giriş koşulları vb."
                 value={rules}
                 onChange={(e) => setRules(e.target.value)}
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Instagram (opsiyonel)</div>
+              <div className="text-xs text-white/50">Instagram (opsiyonel)</div>
               <Input
                 placeholder="https://instagram.com/xyz"
                 value={socialInstagram}
@@ -317,7 +302,7 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Web sitesi (opsiyonel)</div>
+              <div className="text-xs text-white/50">Web sitesi (opsiyonel)</div>
               <Input
                 placeholder="https://..."
                 value={socialWebsite}
@@ -325,10 +310,11 @@ export function MyEvents() {
               />
             </div>
             <div className="space-y-1 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Etkinlik afişi (opsiyonel)</div>
+              <div className="text-xs text-white/50">Etkinlik afişi (opsiyonel)</div>
               <Input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
+                className="file:mr-2 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:text-white/90 file:transition-colors hover:file:bg-white/15"
                 onChange={(e) => {
                   const f = e.target.files?.[0] ?? null;
                   setPosterFile(f);
@@ -336,7 +322,7 @@ export function MyEvents() {
                 }}
               />
               {posterPreview && (
-                <div className="overflow-hidden rounded-md border border-white/10 bg-black/20">
+                <div className="overflow-hidden rounded-md border border-white/10 bg-white/5">
                   <img
                     src={posterPreview}
                     alt="Etkinlik afiş önizleme"
@@ -346,28 +332,28 @@ export function MyEvents() {
               )}
             </div>
           </div>
-          <Button onClick={createOrUpdateEvent} className="w-full">
+          <Button onClick={createOrUpdateEvent} className="w-full bg-white/10 text-white hover:bg-white/20 border-0">
             {editingId ? "Etkinliği güncelle" : "Etkinlik oluştur"}
           </Button>
         </CardContent>
       </Card>
 
-      <Card className="border-white/10 bg-black/25">
+      <Card className="border-white/5 bg-black/40 shadow-none">
         <CardHeader>
-          <CardTitle>Etkinlik listesi</CardTitle>
-          <CardDescription>Seçili organizasyona ait etkinlikler.</CardDescription>
+          <CardTitle className="text-white/95">Etkinlik listesi</CardTitle>
+          <CardDescription className="text-white/50">Seçili organizasyona ait etkinlikler.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {eventsQuery.isLoading && (
-            <div className="text-sm text-muted-foreground">Yükleniyor...</div>
+            <div className="text-sm text-white/50">Yükleniyor...</div>
           )}
           {selectedOrgId && eventsQuery.data && eventsQuery.data.length === 0 && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-white/50">
               Bu organizasyona ait etkinlik yok. Yukarıdan yeni bir etkinlik oluştur.
             </div>
           )}
           {!selectedOrgId && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-white/50">
               Önce yukarıdan bir organizasyon seç.
             </div>
           )}
@@ -379,10 +365,10 @@ export function MyEvents() {
                   : ev.poster_url ?? null;
 
               return (
-                <Card key={ev.id} className="border-white/10 bg-black/20">
+                <Card key={ev.id} className="border-white/5 bg-white/5">
                   <CardContent className="flex gap-3 p-3">
                     {posterSrc && (
-                      <div className="h-20 w-16 flex-shrink-0 overflow-hidden rounded-md border border-white/10 bg-black/20">
+                      <div className="h-20 w-16 flex-shrink-0 overflow-hidden rounded-md border border-white/10 bg-white/5">
                         <img
                           src={posterSrc}
                           alt={`${ev.name} afiş`}
@@ -394,15 +380,15 @@ export function MyEvents() {
                     <div className="flex min-w-0 flex-1 flex-col gap-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-semibold">{ev.name}</div>
-                          <div className="text-[11px] text-muted-foreground">
+                          <div className="truncate text-sm font-semibold text-white/95">{ev.name}</div>
+                          <div className="text-[11px] text-white/50">
                             {ev.city} • {ev.venue}
                           </div>
                         </div>
                         <Button
                           size="xs"
                           variant="outline"
-                          className="border-white/20 text-[11px]"
+                          className="border-white/15 bg-transparent text-[11px] text-white/80 hover:bg-white/10 hover:text-white"
                           onClick={() => {
                             setEditingId(ev.id);
                             setSelectedOrgId(ev.organization_id);
@@ -438,21 +424,21 @@ export function MyEvents() {
                         </Button>
                       </div>
                       {ev.category && (
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-[11px] text-white/50">
                           Kategori: {ev.category}
                         </div>
                       )}
                       {ev.age_limit && (
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-[11px] text-white/50">
                           Yaş sınırı: {ev.age_limit}
                         </div>
                       )}
-                      <div className="text-[11px] text-muted-foreground">
+                      <div className="text-[11px] text-white/50">
                         {new Date(ev.starts_at).toLocaleString("tr-TR")}
                         {ev.ends_at && ` — ${new Date(ev.ends_at).toLocaleString("tr-TR")}`}
                       </div>
                       {ev.description && (
-                        <div className="line-clamp-2 text-[11px] text-muted-foreground">
+                        <div className="line-clamp-2 text-[11px] text-white/50">
                           {ev.description}
                         </div>
                       )}

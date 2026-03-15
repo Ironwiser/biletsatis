@@ -20,6 +20,7 @@ import {
   CommandList,
 } from "../components/ui/command";
 import { Input } from "../components/ui/input";
+import { Toaster } from "../components/ui/sonner";
 import { mockEvents } from "../data/mockEvents";
 
 export function RootLayout() {
@@ -176,9 +177,14 @@ export function RootLayout() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-[220px]">
                   {role === "admin" && (
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin/organizer-applications">Admin paneli</Link>
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/organizer-applications">Organizatör başvuruları</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/events">Etkinlik onayları</Link>
+                      </DropdownMenuItem>
+                    </>
                   )}
                   {role === "organizer" && (
                     <>
@@ -205,6 +211,7 @@ export function RootLayout() {
       <div className="mx-auto max-w-7xl px-4 py-4 md:py-6">
         <Outlet />
       </div>
+      <Toaster />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api, getApiOrigin } from "../../api/client";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -25,8 +26,6 @@ export function MyOrganizations() {
   const [instagram, setInstagram] = useState("");
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [posterPreview, setPosterPreview] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [ok, setOk] = useState<string | null>(null);
 
   const q = useQuery({
     queryKey: ["my-organizations"],
@@ -47,8 +46,6 @@ export function MyOrganizations() {
   }
 
   async function create() {
-    setError(null);
-    setOk(null);
     try {
       const posterUrl = await uploadPosterIfNeeded();
       await api.post("/organizations", {
@@ -59,7 +56,7 @@ export function MyOrganizations() {
         website,
         instagram,
       });
-      setOk("Organizasyon oluşturuldu.");
+      toast.success("Organizasyon oluşturuldu.");
       setName("");
       setDescription("");
       setCity("");
@@ -72,7 +69,7 @@ export function MyOrganizations() {
       const msg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string } | undefined)?.message ?? "Oluşturma başarısız"
         : "Oluşturma başarısız";
-      setError(msg);
+      toast.error(msg);
     }
   }
 
@@ -83,21 +80,10 @@ export function MyOrganizations() {
         <div className="text-sm text-muted-foreground">Onay sonrası organizasyon oluşturup yönetebilirsin.</div>
       </div>
 
-      {error && (
-        <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200">
-          {error}
-        </div>
-      )}
-      {ok && (
-        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-          {ok}
-        </div>
-      )}
-
-      <Card className="max-w-3xl border-white/10 bg-black/25">
+      <Card className="max-w-3xl border-white/5 bg-black/40 shadow-none">
         <CardHeader>
-          <CardTitle>Yeni organizasyon</CardTitle>
-          <CardDescription>En az ad ve şehir zorunlu.</CardDescription>
+          <CardTitle className="text-white/95">Yeni organizasyon</CardTitle>
+          <CardDescription className="text-white/50">En az ad ve şehir zorunlu.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid gap-3 md:grid-cols-2">
@@ -108,7 +94,7 @@ export function MyOrganizations() {
             <div className="space-y-1 md:col-span-2">
               <div className="text-xs text-muted-foreground">Açıklama (opsiyonel)</div>
               <textarea
-                className="min-h-[90px] w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="min-h-[90px] w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/90 placeholder:text-white/40 focus-visible:outline-none focus-visible:border-white/20 focus-visible:ring-1 focus-visible:ring-white/20"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -118,7 +104,7 @@ export function MyOrganizations() {
               <Input value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Web sitesi (opsiyonel)</div>
+              <div className="text-xs text-white/50">Web sitesi (opsiyonel)</div>
               <Input
                 placeholder="https://..."
                 value={website}
@@ -126,7 +112,7 @@ export function MyOrganizations() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Instagram (opsiyonel)</div>
+              <div className="text-xs text-white/50">Instagram (opsiyonel)</div>
               <Input
                 placeholder="https://instagram.com/..."
                 value={instagram}
@@ -134,10 +120,11 @@ export function MyOrganizations() {
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <div className="text-xs text-muted-foreground">Afiş (jpg/png/webp)</div>
+              <div className="text-xs text-white/50">Afiş (jpg/png/webp)</div>
               <Input
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
+                className="file:mr-2 file:rounded-md file:border-0 file:bg-white/10 file:px-3 file:py-1.5 file:text-xs file:text-white/90 file:transition-colors hover:file:bg-white/15"
                 onChange={(e) => {
                   const f = e.target.files?.[0] ?? null;
                   setPosterFile(f);
@@ -145,7 +132,7 @@ export function MyOrganizations() {
                 }}
               />
               {posterPreview && (
-                <div className="overflow-hidden rounded-md border border-white/10 bg-black/20">
+                <div className="overflow-hidden rounded-md border border-white/10 bg-white/5">
                   <img
                     src={posterPreview}
                     alt="Afiş önizleme"
@@ -153,12 +140,12 @@ export function MyOrganizations() {
                   />
                 </div>
               )}
-              <div className="text-xs text-muted-foreground">
+              <div className="text-xs text-white/40">
                 İpucu: Afiş otomatik sıkıştırılır ve WebP olarak kaydedilir.
               </div>
             </div>
           </div>
-          <Button onClick={create} className="w-full">
+          <Button onClick={create} className="w-full bg-white/10 text-white hover:bg-white/20 border-0">
             Oluştur
           </Button>
         </CardContent>

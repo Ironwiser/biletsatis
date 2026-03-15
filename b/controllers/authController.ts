@@ -121,6 +121,54 @@ export async function getProfile(req: Request, res: Response) {
   return res.json(r.rows[0]);
 }
 
+export async function updateProfile(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+  const { username } = req.body ?? {};
+  if (typeof username !== "string" || !username.trim()) {
+    return res.status(400).json({ message: "Kullanıcı adı zorunlu." });
+  }
+  const trimmed = username.trim();
+  const existing = await query<{ id: string }>(
+    "select id from users where username = $1 and id != $2",
+    [trimmed, req.user.userId]
+  );
+  if (existing.rows.length > 0) {
+    return res.status(409).json({ message: "Bu kullanıcı adı zaten kullanılıyor." });
+  }
+  const r = await query<{ id: string; email: string; username: string; role: string }>(
+    "update users set username = $1, updated_at = now() where id = $2 returning id, email, username, role",
+    [trimmed, req.user.userId]
+  );
+  if (r.rows.length === 0) return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+  return res.json(r.rows[0]);
+}
+
+export async function changePassword(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: "Unauthorized" });
+  const { currentPassword, newPassword } = req.body ?? {};
+  if (typeof currentPassword !== "string" || !currentPassword) {
+    return res.status(400).json({ message: "Mevcut şifre zorunlu." });
+  }
+  if (typeof newPassword !== "string" || newPassword.length < 6) {
+    return res.status(400).json({ message: "Yeni şifre en az 6 karakter olmalı." });
+  }
+  const r = await query<{ password_hash: string }>(
+    "select password_hash from users where id = $1",
+    [req.user.userId]
+  );
+  if (r.rows.length === 0) return res.status(404).json({ message: "Kullanıcı bulunamadı" });
+  const ok = await bcrypt.compare(currentPassword, r.rows[0].password_hash);
+  if (!ok) {
+    return res.status(401).json({ message: "Mevcut şifre hatalı." });
+  }
+  const newHash = await bcrypt.hash(newPassword, 10);
+  await query("update users set password_hash = $1, updated_at = now() where id = $2", [
+    newHash,
+    req.user.userId,
+  ]);
+  return res.json({ message: "Şifre güncellendi." });
+}
+
 export async function logout(_req: Request, res: Response) {
   res.clearCookie("refreshToken", {
     httpOnly: true,

@@ -5,6 +5,8 @@ import {
   refresh,
   register,
   getProfile,
+  updateProfile,
+  changePassword,
 } from "../controllers/authController.js";
 import { authenticateJWT } from "../middleware/auth.js";
 
@@ -15,6 +17,8 @@ router.post("/login", login);
 router.post("/refresh", refresh);
 router.post("/logout", logout);
 router.get("/profile", authenticateJWT, getProfile);
+router.put("/profile", authenticateJWT, updateProfile);
+router.put("/profile/password", authenticateJWT, changePassword);
 
 export default router;
 

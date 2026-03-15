@@ -10,6 +10,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Settings } from "./pages/Settings";
 import { AdminOrganizerApplications } from "./pages/admin/AdminOrganizerApplications";
+import { AdminEventApprovals } from "./pages/admin/AdminEventApprovals";
 import { MyOrganizations } from "./pages/organizer/MyOrganizations";
 import { EventDetail } from "./pages/EventDetail";
 import { MyEvents } from "./pages/organizer/MyEvents";
@@ -27,6 +28,7 @@ const router = createBrowserRouter([
       { path: "settings", element: <Settings /> },
       { path: "events/:id", element: <EventDetail /> },
       { path: "admin/organizer-applications", element: <AdminOrganizerApplications /> },
+      { path: "admin/events", element: <AdminEventApprovals /> },
       { path: "organizer/organizations", element: <MyOrganizations /> },
       { path: "organizer/events", element: <MyEvents /> },
     ],
