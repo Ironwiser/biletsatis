@@ -31,6 +31,7 @@ type EventRow = {
   social_website: string | null;
   starts_at: string;
   ends_at: string | null;
+  price_display: string | null;
 };
 
 export function MyEvents() {
@@ -49,6 +50,7 @@ export function MyEvents() {
   const [socialWebsite, setSocialWebsite] = useState("");
   const [startsAt, setStartsAt] = useState(""); // datetime-local
   const [endsAt, setEndsAt] = useState(""); // datetime-local
+  const [priceDisplay, setPriceDisplay] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [posterFile, setPosterFile] = useState<File | null>(null);
   const [posterPreview, setPosterPreview] = useState<string | null>(null);
@@ -93,6 +95,7 @@ export function MyEvents() {
     setSocialWebsite("");
     setStartsAt("");
     setEndsAt("");
+    setPriceDisplay("");
     setEditingId(null);
     setPosterFile(null);
     setPosterPreview(null);
@@ -137,6 +140,7 @@ export function MyEvents() {
         socialInstagram,
         socialWebsite,
         posterUrl,
+        priceDisplay: priceDisplay.trim(),
         startsAt: startsIso,
         endsAt: endsIso,
       };
@@ -243,6 +247,14 @@ export function MyEvents() {
             <div className="space-y-1">
               <div className="text-xs text-white/50">Şehir</div>
               <Input value={city} onChange={(e) => setCity(e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <div className="text-xs text-white/50">Fiyat (gösterim metni, opsiyonel)</div>
+              <Input
+                placeholder="Örn: ₺ 150, Ücretsiz, ₺ 100 – 200"
+                value={priceDisplay}
+                onChange={(e) => setPriceDisplay(e.target.value)}
+              />
             </div>
             <div className="space-y-1 md:col-span-2">
               <div className="text-xs text-white/50">Adres (opsiyonel)</div>
@@ -374,6 +386,10 @@ export function MyEvents() {
                           alt={`${ev.name} afiş`}
                           className="h-full w-full object-cover"
                           loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "/placeholderposter.webp";
+                          }}
                         />
                       </div>
                     )}
@@ -404,6 +420,7 @@ export function MyEvents() {
                             setRules(ev.rules ?? "");
                             setSocialInstagram(ev.social_instagram ?? "");
                             setSocialWebsite(ev.social_website ?? "");
+                            setPriceDisplay(ev.price_display ?? "");
                             const resolvedPoster =
                               ev.poster_url && !ev.poster_url.startsWith("http")
                                 ? `${getApiOrigin()}${ev.poster_url}`

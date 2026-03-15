@@ -56,6 +56,10 @@ export function SectionRow({ title, items }: { title: string; items: EventCard[]
                     alt={e.title}
                     className="absolute inset-0 h-full w-full object-cover opacity-85 transition-transform duration-300 group-hover:scale-[1.04]"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/placeholderposter.webp";
+                    }}
                   />
                 )}
                 <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.05),rgba(0,0,0,0.92))]" />

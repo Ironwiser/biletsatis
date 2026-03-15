@@ -19,6 +19,7 @@ type EventRow = {
   social_website: string | null;
   starts_at: string;
   ends_at: string | null;
+  price_display: string | null;
 };
 
 export async function createEvent(req: Request, res: Response) {
@@ -41,6 +42,7 @@ export async function createEvent(req: Request, res: Response) {
     rules,
     socialInstagram,
     socialWebsite,
+    priceDisplay,
   } = req.body ?? {};
 
   if (!organizationId || !name || !venue || !city || !startsAt || !category) {
@@ -78,9 +80,10 @@ export async function createEvent(req: Request, res: Response) {
        social_website,
        starts_at,
        ends_at,
+       price_display,
        is_approved
      )
-     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,false)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,false)
      returning
        id,
        organization_id,
@@ -98,7 +101,8 @@ export async function createEvent(req: Request, res: Response) {
        social_instagram,
        social_website,
        starts_at,
-       ends_at`,
+       ends_at,
+       price_display`,
     [
       organizationId,
       name,
@@ -116,6 +120,7 @@ export async function createEvent(req: Request, res: Response) {
       socialWebsite ?? null,
       startsAt,
       endsAt ?? null,
+      typeof priceDisplay === "string" && priceDisplay.trim() ? priceDisplay.trim() : null,
     ]
   );
 
@@ -123,22 +128,23 @@ export async function createEvent(req: Request, res: Response) {
 }
 
 export async function listEvents(req: Request, res: Response) {
-  const { organizationId } = req.query;
-  const isAdmin = (req as any).user?.role === "admin";
+  try {
+    const { organizationId } = req.query;
+    const isAdmin = (req as any).user?.role === "admin";
 
-  const params: any[] = [];
-  let where = "where e.is_deleted = false and e.is_cancelled = false";
-  if (organizationId && typeof organizationId === "string") {
-    params.push(organizationId);
-    where += ` and e.organization_id = $${params.length}`;
-  }
-  // Genel liste (organizationId yok): sadece onaylı etkinlikler. Admin hepsini görebilir.
-  if (!organizationId && !isAdmin) {
-    where += " and e.is_approved = true";
-  }
+    const params: any[] = [];
+    let where = "where e.is_deleted = false and e.is_cancelled = false";
+    if (organizationId && typeof organizationId === "string") {
+      params.push(organizationId);
+      where += ` and e.organization_id = $${params.length}`;
+    }
+    // Genel liste (organizationId yok): sadece onaylı etkinlikler. Admin hepsini görebilir.
+    if (!organizationId && !isAdmin) {
+      where += " and e.is_approved = true";
+    }
 
-  const r = await query<EventRow>(
-    `select
+    const r = await query<EventRow>(
+      `select
        e.id,
        e.organization_id,
        e.name,
@@ -155,14 +161,19 @@ export async function listEvents(req: Request, res: Response) {
        e.social_instagram,
        e.social_website,
        e.starts_at,
-       e.ends_at
+       e.ends_at,
+       e.price_display
      from events e
      ${where}
      order by e.starts_at asc`,
-    params
-  );
+      params
+    );
 
-  return res.json({ events: r.rows });
+    return res.json({ events: r.rows });
+  } catch (err) {
+    console.error("[listEvents]", err);
+    return res.status(500).json({ message: "Etkinlikler yüklenemedi." });
+  }
 }
 
 export async function getEvent(req: Request, res: Response) {
@@ -188,6 +199,7 @@ export async function getEvent(req: Request, res: Response) {
        e.social_website,
        e.starts_at,
        e.ends_at,
+       e.price_display,
        e.is_approved
      from events e
      where e.id = $1 and e.is_deleted = false and e.is_cancelled = false`,
@@ -246,6 +258,7 @@ export async function updateEvent(req: Request, res: Response) {
     rules,
     socialInstagram,
     socialWebsite,
+    priceDisplay,
   } = req.body ?? {};
 
   const r = await query<EventRow>(
@@ -266,8 +279,9 @@ export async function updateEvent(req: Request, res: Response) {
        social_website = $13,
        starts_at = coalesce($14, starts_at),
        ends_at = $15,
+       price_display = $16,
        updated_at = now()
-     where id = $16
+     where id = $17
      returning
        id,
        organization_id,
@@ -285,7 +299,8 @@ export async function updateEvent(req: Request, res: Response) {
        social_instagram,
        social_website,
        starts_at,
-       ends_at`,
+       ends_at,
+       price_display`,
     [
       name ?? null,
       description ?? null,
@@ -302,6 +317,7 @@ export async function updateEvent(req: Request, res: Response) {
       socialWebsite ?? null,
       startsAt ?? null,
       endsAt ?? null,
+      priceDisplay !== undefined ? (typeof priceDisplay === "string" && priceDisplay.trim() ? priceDisplay.trim() : null) : undefined,
       id,
     ]
   );
@@ -329,7 +345,7 @@ export async function getFeaturedPopup(req: Request, res: Response) {
        e.id, e.organization_id, e.name, e.description, e.venue, e.city,
        e.poster_url, e.category, e.event_type, e.address, e.age_limit,
        e.door_time, e.rules, e.social_instagram, e.social_website,
-       e.starts_at, e.ends_at
+       e.starts_at, e.ends_at, e.price_display
      from events e
      where e.id = $1 and e.is_deleted = false and e.is_cancelled = false and e.is_approved = true`,
     [eventId]

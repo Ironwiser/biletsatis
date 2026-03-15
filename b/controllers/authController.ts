@@ -38,51 +38,60 @@ export async function register(req: Request, res: Response) {
 }
 
 export async function login(req: Request, res: Response) {
-  const { email, password } = req.body ?? {};
-  if (!email || !password) {
-    return res.status(400).json({ message: "E-mail ve şifre zorunlu." });
+  try {
+    const { email, password } = req.body ?? {};
+    if (!email || !password) {
+      return res.status(400).json({ message: "E-mail ve şifre zorunlu." });
+    }
+
+    const result = await query<{
+      id: string;
+      email: string;
+      username: string;
+      password_hash: string | null;
+      role: string;
+    }>("select id,email,username,password_hash,role from users where email = $1", [email]);
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ message: "Geçersiz e-mail veya şifre." });
+    }
+
+    const user = result.rows[0];
+    if (!user.password_hash) {
+      console.error("[login] Kullanıcıda password_hash yok:", user.email);
+      return res.status(401).json({ message: "Geçersiz e-mail veya şifre." });
+    }
+    const ok = await bcrypt.compare(password, user.password_hash);
+    if (!ok) {
+      return res.status(401).json({ message: "Geçersiz e-mail veya şifre." });
+    }
+
+    const accessToken = signAccessToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    const refreshToken = signRefreshToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.json({
+      accessToken,
+      user: { id: user.id, email: user.email, username: user.username, role: user.role },
+    });
+  } catch (err) {
+    console.error("[login]", err);
+    return res.status(500).json({ message: "Giriş işlemi sırasında bir hata oluştu." });
   }
-
-  const result = await query<{
-    id: string;
-    email: string;
-    username: string;
-    password_hash: string;
-    role: string;
-  }>("select id,email,username,password_hash,role from users where email = $1", [email]);
-
-  if (result.rows.length === 0) {
-    return res.status(401).json({ message: "Geçersiz e-mail veya şifre." });
-  }
-
-  const user = result.rows[0];
-  const ok = await bcrypt.compare(password, user.password_hash);
-  if (!ok) {
-    return res.status(401).json({ message: "Geçersiz e-mail veya şifre." });
-  }
-
-  const accessToken = signAccessToken({
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-  });
-  const refreshToken = signRefreshToken({
-    userId: user.id,
-    email: user.email,
-    role: user.role,
-  });
-
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
-
-  return res.json({
-    accessToken,
-    user: { id: user.id, email: user.email, username: user.username, role: user.role },
-  });
 }
 
 export async function refresh(req: Request, res: Response) {

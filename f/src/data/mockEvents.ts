@@ -1,35 +1,6 @@
 import type { EventCard } from "../components/home/types";
 
-import event1 from "../assets/placeholders/event-1.jpg";
-import event2 from "../assets/placeholders/event-2.jpg";
-import event3 from "../assets/placeholders/event-3.jpg";
-import event4 from "../assets/placeholders/event-4.jpg";
-import event5 from "../assets/placeholders/event-5.jpg";
-import event6 from "../assets/placeholders/event-6.jpg";
-import event7 from "../assets/placeholders/event-7.jpg";
-import event8 from "../assets/placeholders/event-8.jpg";
-import event9 from "../assets/placeholders/event-9.jpg";
-import event10 from "../assets/placeholders/event-10.jpg";
-import event11 from "../assets/placeholders/event-11.jpg";
-import event12 from "../assets/placeholders/event-12.jpg";
-import event13 from "../assets/placeholders/event-13.jpg";
-import event14 from "../assets/placeholders/event-14.jpg";
-import event15 from "../assets/placeholders/event-15.jpg";
-import event16 from "../assets/placeholders/event-16.jpg";
-import event17 from "../assets/placeholders/event-17.jpg";
-import event18 from "../assets/placeholders/event-18.jpg";
-import event19 from "../assets/placeholders/event-19.jpg";
-import event20 from "../assets/placeholders/event-20.jpg";
-import event21 from "../assets/placeholders/event-21.jpg";
-import event22 from "../assets/placeholders/event-22.jpg";
-import event23 from "../assets/placeholders/event-23.jpg";
-import event24 from "../assets/placeholders/event-24.jpg";
-import event25 from "../assets/placeholders/event-25.jpg";
-import generated1 from "../assets/placeholders/Generated_image1.png";
-import generated2 from "../assets/placeholders/Generated_image2.png";
-import generated3 from "../assets/placeholders/Generated_image3.png";
-import generated4 from "../assets/placeholders/Generated_image4.png";
-import generated5 from "../assets/placeholders/Generated_image5.png";
+const PLACEHOLDER_IMG = "/placeholderposter.webp";
 
 export const mockEvents: EventCard[] = [
   {
@@ -42,7 +13,7 @@ export const mockEvents: EventCard[] = [
     tags: ["TECHNO", "HOUSE"],
     priceText: "₺ 1.000",
     badge: "HOT TICKET",
-    imageSrc: event1,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e2",
@@ -53,7 +24,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:00",
     tags: ["TECHNO"],
     priceText: "₺ 1.250",
-    imageSrc: event2,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e3",
@@ -64,7 +35,7 @@ export const mockEvents: EventCard[] = [
     timeText: "16:00",
     tags: ["HOUSE"],
     priceText: "₺ 2.000",
-    imageSrc: event3,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e4",
@@ -75,7 +46,7 @@ export const mockEvents: EventCard[] = [
     timeText: "12:00",
     tags: ["HOUSE", "DISCO"],
     priceText: "₺ 950",
-    imageSrc: event4,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e5",
@@ -86,7 +57,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:00",
     tags: ["MELODIC"],
     priceText: "₺ 1.500",
-    imageSrc: event5,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e6",
@@ -97,7 +68,7 @@ export const mockEvents: EventCard[] = [
     timeText: "22:00",
     tags: ["TECHNO"],
     priceText: "₺ 500",
-    imageSrc: event6,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e7",
@@ -108,7 +79,7 @@ export const mockEvents: EventCard[] = [
     timeText: "20:00",
     tags: ["HOUSE"],
     priceText: "₺ 850",
-    imageSrc: event7,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e8",
@@ -119,7 +90,7 @@ export const mockEvents: EventCard[] = [
     timeText: "22:00",
     tags: ["ELECTRONIC"],
     priceText: "€ 45",
-    imageSrc: event8,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e9",
@@ -130,7 +101,7 @@ export const mockEvents: EventCard[] = [
     timeText: "23:00",
     tags: ["TECHNO"],
     priceText: "€ 55",
-    imageSrc: event9,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e10",
@@ -141,7 +112,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:30",
     tags: ["SOUL"],
     priceText: "₺ 1.200",
-    imageSrc: event10,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e11",
@@ -152,7 +123,7 @@ export const mockEvents: EventCard[] = [
     timeText: "18:00",
     tags: ["INDIE"],
     priceText: "₺ 650",
-    imageSrc: event11,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e12",
@@ -163,7 +134,7 @@ export const mockEvents: EventCard[] = [
     timeText: "16:00",
     tags: ["HOUSE"],
     priceText: "₺ 900",
-    imageSrc: event12,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e13",
@@ -174,7 +145,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:00",
     tags: ["LO-FI"],
     priceText: "₺ 400",
-    imageSrc: event13,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e14",
@@ -185,7 +156,7 @@ export const mockEvents: EventCard[] = [
     timeText: "17:00",
     tags: ["TECHNO"],
     priceText: "€ 70",
-    imageSrc: event14,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e15",
@@ -196,7 +167,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:30",
     tags: ["MELODIC"],
     priceText: "₺ 500",
-    imageSrc: event15,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e16",
@@ -207,7 +178,7 @@ export const mockEvents: EventCard[] = [
     timeText: "05:00",
     tags: ["HOUSE"],
     priceText: "₺ 700",
-    imageSrc: event16,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e17",
@@ -218,7 +189,7 @@ export const mockEvents: EventCard[] = [
     timeText: "19:00",
     tags: ["TECHNO"],
     priceText: "₺ 950",
-    imageSrc: event17,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e18",
@@ -229,7 +200,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:00",
     tags: ["JAZZ"],
     priceText: "₺ 600",
-    imageSrc: event18,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e19",
@@ -240,7 +211,7 @@ export const mockEvents: EventCard[] = [
     timeText: "20:00",
     tags: ["HOUSE"],
     priceText: "₺ 800",
-    imageSrc: event19,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e20",
@@ -251,7 +222,7 @@ export const mockEvents: EventCard[] = [
     timeText: "23:30",
     tags: ["MINIMAL"],
     priceText: "€ 40",
-    imageSrc: event20,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e21",
@@ -262,7 +233,7 @@ export const mockEvents: EventCard[] = [
     timeText: "14:00",
     tags: ["FESTIVAL"],
     priceText: "₺ 1.100",
-    imageSrc: event21,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e22",
@@ -273,7 +244,7 @@ export const mockEvents: EventCard[] = [
     timeText: "22:00",
     tags: ["DISCO"],
     priceText: "₺ 550",
-    imageSrc: event22,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e23",
@@ -284,7 +255,7 @@ export const mockEvents: EventCard[] = [
     timeText: "18:00",
     tags: ["CHILL"],
     priceText: "₺ 750",
-    imageSrc: event23,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e24",
@@ -295,7 +266,7 @@ export const mockEvents: EventCard[] = [
     timeText: "23:00",
     tags: ["TECHNO"],
     priceText: "₺ 950",
-    imageSrc: event24,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e25",
@@ -306,7 +277,7 @@ export const mockEvents: EventCard[] = [
     timeText: "20:30",
     tags: ["MELODIC"],
     priceText: "₺ 1.050",
-    imageSrc: event25,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e26",
@@ -317,7 +288,7 @@ export const mockEvents: EventCard[] = [
     timeText: "22:30",
     tags: ["ELECTRONIC"],
     priceText: "₺ 900",
-    imageSrc: generated1,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e27",
@@ -328,7 +299,7 @@ export const mockEvents: EventCard[] = [
     timeText: "23:30",
     tags: ["TECHNO"],
     priceText: "€ 45",
-    imageSrc: generated2,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e28",
@@ -339,7 +310,7 @@ export const mockEvents: EventCard[] = [
     timeText: "21:00",
     tags: ["HOUSE"],
     priceText: "₺ 750",
-    imageSrc: generated3,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e29",
@@ -350,7 +321,7 @@ export const mockEvents: EventCard[] = [
     timeText: "20:00",
     tags: ["MELODIC"],
     priceText: "€ 55",
-    imageSrc: generated4,
+    imageSrc: PLACEHOLDER_IMG,
   },
   {
     id: "e30",
@@ -361,7 +332,7 @@ export const mockEvents: EventCard[] = [
     timeText: "22:00",
     tags: ["MINIMAL"],
     priceText: "₺ 650",
-    imageSrc: generated5,
+    imageSrc: PLACEHOLDER_IMG,
   },
 ];
 

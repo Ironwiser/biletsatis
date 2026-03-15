@@ -1,0 +1,2 @@
+# Bu klasöre DB'deki poster_url ile uyumlu afiş dosyalarını (.webp) koyun.
+# ./deploy.sh çalıştığında içerik b/uploads/posters/ içine kopyalanır.

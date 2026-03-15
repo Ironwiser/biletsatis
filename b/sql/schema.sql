@@ -82,9 +82,13 @@ create table if not exists events (
   ends_at timestamptz,
   is_cancelled boolean not null default false,
   is_deleted boolean not null default false,
+  is_approved boolean not null default true,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table events
+  add column if not exists is_approved boolean not null default true;
 
 alter table events
   add column if not exists category text;
@@ -113,6 +117,9 @@ alter table events
 alter table events
   add column if not exists poster_url text;
 
+alter table events
+  add column if not exists price_display text;
+
 -- Biletler (şimdilik satın alma yok; manuel insert veya admin aracıyla üretilecek)
 create table if not exists tickets (
   id uuid primary key default uuid_generate_v4(),
@@ -138,4 +145,13 @@ create table if not exists ticket_scans (
 
 create index if not exists idx_ticket_scans_event_id on ticket_scans(event_id);
 create index if not exists idx_ticket_scans_ticket_id on ticket_scans(ticket_id);
+
+-- Site ayarları (örn. ana sayfa popup etkinliği)
+create table if not exists site_settings (
+  key text primary key,
+  value text
+);
+
+insert into site_settings (key, value) values ('featured_popup_event_id', null)
+on conflict (key) do nothing;
 

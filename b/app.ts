@@ -19,10 +19,11 @@ import ticketAdminRoutes from "./routes/ticketAdminRoutes.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const envPath = path.join(
-  __dirname,
-  process.env.NODE_ENV === "production" ? ".env.production" : ".env.development"
-);
+// Production'da dist/ icinden calisiyoruz; .env.production b/ (ust dizin) icinde
+const envPath =
+  process.env.NODE_ENV === "production"
+    ? path.join(__dirname, "..", ".env.production")
+    : path.join(__dirname, ".env.development");
 dotenv.config({ path: envPath });
 
 const app = express();
@@ -50,8 +51,8 @@ app.get("/api/health", async (_req, res) => {
   res.json({ ok: r.rows[0].ok === 1 });
 });
 
-// Static uploads
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Static uploads (b/uploads — deploy'da dist silindiğinde silinmesin diye cwd kullanılıyor)
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/api", authRoutes);
 app.use("/api/organizer-applications", organizerApplicationRoutes);

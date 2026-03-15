@@ -5,7 +5,15 @@ export function HeroBanner({ imageSrc }: { imageSrc: string }) {
   return (
     <Card className="relative overflow-hidden border-white/10 bg-black/25 p-0">
       <div className="relative h-[220px] w-full md:h-[320px]">
-        <img src={imageSrc} alt="Hero" className="absolute inset-0 h-full w-full object-cover opacity-85" />
+        <img
+          src={imageSrc}
+          alt="Hero"
+          className="absolute inset-0 h-full w-full object-cover opacity-85"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = "/placeholderposter.webp";
+          }}
+        />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.65),rgba(0,0,0,0.25),rgba(0,0,0,0.7))]" />
         <div className="absolute inset-0 bg-[radial-gradient(800px_260px_at_50%_20%,rgba(255,255,255,0.12),transparent_60%)]" />
 

@@ -1,0 +1,2 @@
+# Shell script'ler her zaman LF (Unix) satır sonu ile commit edilsin; sunucuda "bash\r" hatası olmasın
+*.sh text eol=lf

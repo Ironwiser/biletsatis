@@ -170,6 +170,10 @@ export function MyOrganizations() {
                         alt={`${o.name} afiş`}
                         className="h-36 w-full object-cover"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/placeholderposter.webp";
+                        }}
                       />
                     </div>
                   )}

@@ -35,8 +35,7 @@
     "start:prod": "NODE_ENV=production node dist/app.js",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "db:init": "tsx scripts/init-db.ts",
-    "db:event-approval": "tsx scripts/run-event-approval-migration.ts"
+    "db:init": "tsx scripts/init-db.ts"
   },
   "ts-node": {
     "esm": true

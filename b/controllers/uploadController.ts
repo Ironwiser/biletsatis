@@ -1,22 +1,19 @@
 import { Request, Response } from "express";
 import path from "path";
-import { fileURLToPath } from "url";
 import fs from "fs";
 import sharp from "sharp";
 import { v4 as uuidv4 } from "uuid";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 function ensureDir(p: string) {
   if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
 }
 
+/** Afişler b/uploads/posters içine yazılır (deploy'da dist silindiğinde kaybolmaması için cwd). */
 export async function uploadPoster(req: Request, res: Response) {
   if (!req.user) return res.status(401).json({ message: "Unauthorized" });
   if (!req.file) return res.status(400).json({ message: "Dosya bulunamadı" });
 
-  const uploadsRoot = path.join(__dirname, "..", "uploads");
+  const uploadsRoot = path.join(process.cwd(), "uploads");
   const postersDir = path.join(uploadsRoot, "posters");
   ensureDir(postersDir);
 

@@ -6,10 +6,11 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const envPath = path.join(
-  __dirname,
-  process.env.NODE_ENV === "production" ? ".env.production" : ".env.development"
-);
+// Production: dist/ icinden calisirken .. = b/, tsx/script b/ icinden calisirken __dirname = b/
+const envPath =
+  process.env.NODE_ENV === "production"
+    ? path.join(__dirname, __dirname.endsWith("dist") ? ".." : ".", ".env.production")
+    : path.join(__dirname, ".env.development");
 dotenv.config({ path: envPath });
 
 function getDatabaseConfig(): pg.PoolConfig {

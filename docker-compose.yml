@@ -1,0 +1,85 @@
+# biletsatis — pratik tarzı (sunucuda birden fazla proje için portlar ayrı)
+# .env dosyası deploy/redeploy-docker.sh ile veya elle oluşturulur
+
+services:
+  database:
+    image: postgres:17-alpine
+    container_name: biletsatis_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: biletsatis
+      TZ: Europe/Istanbul
+      PGTZ: Europe/Istanbul
+    volumes:
+      - biletsatis_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -h localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build:
+      context: ./b
+      dockerfile: Dockerfile
+    container_name: biletsatis_backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: database
+      DB_USER: postgres
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_NAME: biletsatis
+      DB_PORT: 5432
+      CORS_ORIGIN: https://${DOMAIN}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET}
+    volumes:
+      - biletsatis_uploads:/app/uploads
+    expose:
+      - "3000"
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./f
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: https://${DOMAIN}/api
+    container_name: biletsatis_frontend
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: biletsatis_nginx
+    ports:
+      - "${NGINX_HTTP_PORT:-9001}:80"
+      - "${NGINX_HTTPS_PORT:-9441}:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/sites/biletsatis.conf:/etc/nginx/conf.d/default.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+volumes:
+  biletsatis_postgres_data:
+  biletsatis_uploads:
+
+networks:
+  default:
+    name: biletsatis_net
+    driver: bridge

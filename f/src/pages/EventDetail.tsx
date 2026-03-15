@@ -59,6 +59,10 @@ export function EventDetail() {
               src={event.imageSrc}
               alt={event.title}
               className="h-[420px] w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/placeholderposter.webp";
+              }}
             />
           )}
           {!event.imageSrc && (

@@ -31,15 +31,20 @@ export async function createOrganization(req: Request, res: Response) {
 }
 
 export async function listOrganizations(_req: Request, res: Response) {
-  const r = await query(
-    `select o.id, o.name, o.description, o.city, o.poster_url, o.website, o.instagram, o.created_at,
+  try {
+    const r = await query(
+      `select o.id, o.name, o.description, o.city, o.poster_url, o.website, o.instagram, o.created_at,
             u.username as organizer_username
      from organizations o
      join users u on u.id = o.organizer_user_id
      where o.is_deleted = false and o.is_cancelled = false
      order by o.created_at desc`
-  );
-  return res.json({ organizations: r.rows });
+    );
+    return res.json({ organizations: r.rows });
+  } catch (err) {
+    console.error("[listOrganizations]", err);
+    return res.status(500).json({ message: "Organizasyonlar yüklenemedi." });
+  }
 }
 
 export async function listMyOrganizations(req: Request, res: Response) {

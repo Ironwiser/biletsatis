@@ -12,8 +12,6 @@ import {
 import { SectionRow } from "../components/home/SectionRow";
 import { Top10List } from "../components/home/Top10List";
 import { WideBanner } from "../components/home/WideBanner";
-import wide1 from "../assets/placeholders/seatomountain.png";
-import wide2 from "../assets/placeholders/faroeislandDenmark.png";
 import { api, getApiOrigin } from "../api/client";
 import { mapApiEventToCard } from "../api/events";
 import type { ApiEvent } from "../api/events";
@@ -24,9 +22,8 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import { Button } from "../components/ui/button";
-import defaultPoster from "../assets/placeholders/event-1.jpg";
 
-const FEATURED_POPUP_DISMISSED_KEY = "featured_popup_dismissed";
+const DEFAULT_POSTER = "/placeholderposter.webp";
 
 export function Home() {
   const [topTab, setTopTab] = useState<TopTab>("tumu");
@@ -42,17 +39,16 @@ export function Home() {
     },
   });
 
+  // Ana sayfaya her girildiğinde öne çıkan etkinlik varsa dialog aç
   useEffect(() => {
     const featured = featuredPopupQuery.data;
-    if (featured && !sessionStorage.getItem(FEATURED_POPUP_DISMISSED_KEY)) {
-      setPopupOpen(true);
+    if (featured) {
+      const t = setTimeout(() => setPopupOpen(true), 0);
+      return () => clearTimeout(t);
     }
   }, [featuredPopupQuery.data]);
 
-  const handleClosePopup = () => {
-    sessionStorage.setItem(FEATURED_POPUP_DISMISSED_KEY, "1");
-    setPopupOpen(false);
-  };
+  const handleClosePopup = () => setPopupOpen(false);
 
   const eventsQuery = useQuery({
     queryKey: ["events-public"],
@@ -110,7 +106,7 @@ export function Home() {
     ? featuredEvent.poster_url.startsWith("http")
       ? featuredEvent.poster_url
       : `${getApiOrigin()}${featuredEvent.poster_url}`
-    : defaultPoster;
+    : DEFAULT_POSTER;
   const featuredDateText = featuredEvent
     ? new Date(featuredEvent.starts_at).toLocaleDateString("tr-TR", {
         day: "2-digit",
@@ -119,11 +115,20 @@ export function Home() {
         weekday: "long",
       })
     : "";
+  const featuredTimeText = featuredEvent
+    ? new Date(featuredEvent.starts_at).toLocaleTimeString("tr-TR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
 
   return (
     <div className="space-y-6">
-      <Dialog open={popupOpen} onOpenChange={(open) => !open && handleClosePopup()}>
-        <DialogContent className="max-w-md border-white/20 bg-black/90 backdrop-blur">
+      <Dialog
+        open={popupOpen}
+        onOpenChange={setPopupOpen}
+      >
+        <DialogContent className="max-w-md border-white/20 bg-black/90 backdrop-blur [&>button]:right-4 [&>button]:top-4 [&>button]:rounded-md [&>button]:border [&>button]:border-white/15 [&>button]:bg-white/5 [&>button]:text-white/80 [&>button]:opacity-100 [&>button]:hover:bg-white/15 [&>button]:hover:text-white [&>button]:focus:ring-white/30">
           {featuredEvent && (
             <>
               <DialogHeader>
@@ -135,16 +140,27 @@ export function Home() {
                     src={featuredPosterSrc}
                     alt={featuredEvent.name}
                     className="h-48 w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/placeholderposter.webp";
+                    }}
                   />
                 </div>
                 <div className="space-y-1">
                   <div className="font-semibold text-lg">{featuredEvent.name}</div>
-                  <div className="text-sm text-muted-foreground">
-                    {featuredEvent.venue} • {featuredEvent.city}
+                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
+                    <span><span className="text-white/50">Mekan:</span> {featuredEvent.venue}</span>
+                    <span><span className="text-white/50">Şehir:</span> {featuredEvent.city}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">{featuredDateText}</div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-muted-foreground">
+                    <span><span className="text-white/50">Tarih:</span> {featuredDateText}</span>
+                    <span><span className="text-white/50">Saat:</span> {featuredTimeText}</span>
+                  </div>
                 </div>
-                <Button asChild className="w-full">
+                <Button
+                  asChild
+                  className="w-full border border-white/20 bg-white/10 text-white hover:bg-white/20 hover:border-white/30"
+                >
                   <Link to={`/events/${featuredEvent.id}`} onClick={handleClosePopup}>
                     Etkinliği gör & bilet al
                   </Link>
@@ -178,10 +194,10 @@ export function Home() {
           <div className="space-y-4">
             <Top10List items={top10} />
             <SectionRow title="biletsatis'de En Yeniler!" items={filteredForSections} />
-            <WideBanner src={wide1} />
+            <WideBanner src="https://placehold.co/1200x200/1a1a1a/555?text=biletsatis" />
             <SectionRow title="Sadece biletsatis'de" items={events} />
             <SectionRow title="Bu Hafta" items={[...events].reverse()} />
-            <WideBanner src={wide2} />
+            <WideBanner src="https://placehold.co/1200x200/252525/666?text=Etkinlikler" />
           </div>
         </>
       )}
@@ -218,6 +234,10 @@ export function Home() {
                         alt={`${o.name} afiş`}
                         className="h-full w-full object-cover"
                         loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/placeholderposter.webp";
+                        }}
                       />
                     </div>
                   )}

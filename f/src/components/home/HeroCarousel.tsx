@@ -40,6 +40,10 @@ export function HeroCarousel({ slides }: { slides: EventCard[] }) {
                     alt={s.title}
                     className="absolute inset-0 h-full w-full object-cover opacity-90"
                     loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "/placeholderposter.webp";
+                    }}
                   />
                 )}
               </div>

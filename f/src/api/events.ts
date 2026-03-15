@@ -1,8 +1,8 @@
 import { getApiOrigin } from "./client";
 import type { EventCard } from "../components/home/types";
 
-/** Afişi olmayan etkinliklerde gösterilecek varsayılan görsel */
-import defaultPoster from "../assets/placeholders/event-1.jpg";
+/** Afişi olmayan etkinliklerde gösterilecek varsayılan görsel (f/public/placeholderposter.webp) */
+const DEFAULT_POSTER = "/placeholderposter.webp";
 
 /** Backend /api/events listesinden dönen tek etkinlik tipi */
 export type ApiEvent = {
@@ -23,6 +23,7 @@ export type ApiEvent = {
   social_website: string | null;
   starts_at: string;
   ends_at: string | null;
+  price_display: string | null;
 };
 
 function formatDateText(iso: string): string {
@@ -47,7 +48,7 @@ export function mapApiEventToCard(e: ApiEvent): EventCard {
     ? e.poster_url.startsWith("http")
       ? e.poster_url
       : `${origin}${e.poster_url}`
-    : defaultPoster;
+    : DEFAULT_POSTER;
 
   const tags: string[] = [];
   if (e.category) tags.push(e.category);
@@ -57,6 +58,14 @@ export function mapApiEventToCard(e: ApiEvent): EventCard {
   }
   if (tags.length === 0) tags.push("ETKİNLİK");
 
+  const raw = e.price_display && e.price_display.trim() ? e.price_display.trim() : "";
+  const priceText =
+    raw === ""
+      ? "₺ —"
+      : /^[\d\s,.\-–—]/.test(raw)
+        ? `₺ ${raw}`
+        : raw;
+
   return {
     id: e.id,
     title: e.name,
@@ -65,7 +74,7 @@ export function mapApiEventToCard(e: ApiEvent): EventCard {
     dateText: formatDateText(e.starts_at),
     timeText: formatTimeText(e.starts_at),
     tags,
-    priceText: "₺ —",
+    priceText,
     imageSrc,
   };
 }
